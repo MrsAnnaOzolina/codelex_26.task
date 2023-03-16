@@ -1,10 +1,11 @@
 <script setup lang="ts">
 
 import axios from 'axios'
-import { onMounted, onUpdated, ref, watch } from 'vue'
+import { nextTick, onBeforeUpdate, onMounted, onServerPrefetch, onUpdated, ref, watch } from 'vue'
 
 const url = "http://api.weatherapi.com/v1/current.json?key=fe37194fc13c40978da103109231503&aqi=yes&q="
 
+let  value = "Dobele"
 const data = ref({})
 const data1 = ref({})
 const data2 = ref({})
@@ -15,10 +16,13 @@ let image = ""
 let imageText = ""
 const toggle = ref(false)
 const props = defineProps(['value'])
+let loadingState =  true
 
 
-function getData(value: string) {
-  axios.get(url + value)
+
+async function getData(value: string) {
+  loadingState = false
+   axios.get(url + value)
     .then((response) => {
       data.value = response.data.location
       data1.value = response.data.current
@@ -28,25 +32,31 @@ function getData(value: string) {
       co.value = response.data.current.air_quality.co.toFixed(2)
       pm2_5.value = response.data.current.air_quality.pm2_5.toFixed(2)
       pm10.value = response.data.current.air_quality.pm10.toFixed(2)
-      console.log(response.data)
+      console.log(response)
+      loadingState = true
+      console.log(loadingState)
     })
     .catch((error) => {
       console.log(error)
     })
-}
+
+  }
+
 
 onMounted(() => {
-
-  getData("Dobele")
+   getData(value);
+   
 }),
-  onUpdated(() => {
 
-    getData(props.value)
-  })
+watch(props, ()=>
+    getData(props.value) 
+  );
+
 
 </script>
 
 <template>
+<div v-if="loadingState">
   <div class="toogle">
     <span>Show {{ !toggle ? "°F" : "°C" }}</span>
     <label class="switch">
@@ -64,7 +74,7 @@ onMounted(() => {
         fill="white" />
     </svg>
   </span>
-  <div class="uk-card uk-card-hover uk-card-secondary .uk-align-center card">
+  <div class="uk-card uk-card-hover uk-card-secondary .uk-align-center card" >
     <div class="card__first">
       <div class="card__box">
         <p class="card--text"><svg width="20px" fill="#b0a6a6" version="1.1" id="Capa_1"
@@ -129,6 +139,7 @@ onMounted(() => {
       </div>
     </div>
   </div>
+</div>
 </template>
 
 <style scoped>

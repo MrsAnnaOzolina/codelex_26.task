@@ -4,13 +4,21 @@ import HelloWorld from './WetherApp.vue';
 
 const searchValue = ref("")
 const text = ref("")
+const formSubmitted = ref(false)
+
+// const setValue = () => {
+//     searchValue = text,
+//     text = ref(" "
+// }
+
 </script>
 
 <template>
     <div>
-        <form class="form" @:submit.prevent="searchValue = text; text = '' ">
-            <label class="uk-form-label form--gap"> Search your favorite city</label>
+        <form class="form" @:submit.prevent="searchValue = text; text = ''; formSubmitted = true ">
+            <label class="uk-form-label form--gap"> See current weather in your favorite city</label>
             <input class="form__input form--gap" type="text" placeholder="city name" v-model="text">
+            <p v-if="searchValue.length === 0 && formSubmitted" style="color: red">Please write city Name </p>
             <button class="form__button form--gap"> search </button>
         </form>
         <HelloWorld :value="searchValue" />
@@ -21,7 +29,7 @@ const text = ref("")
 <style>
 .form {
     margin: 50px;
-    width: 80vw;
+    width: 40vw;
     /* width: 80vw; */
     display: grid;
 
@@ -35,7 +43,12 @@ const text = ref("")
 .form__input {
     border: none;
     background-color: transparent;
-    border-bottom: 2px solid grey;
+    border-bottom: 1px solid rgb(214, 214, 214);
+    color: rgb(214, 214, 214) ;
+}
+.form__input:focus {
+  outline: none;
+  border: none;
 }
 
 .form__button {
